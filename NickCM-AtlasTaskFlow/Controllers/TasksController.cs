@@ -177,5 +177,75 @@ namespace NickCM_AtlasTaskFlow.Controllers
                 "UserId",
                 "Name");
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Claim(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            //only allow project members to access this task
+            var task = await _context.TaskItems
+                .FirstOrDefaultAsync(t =>
+                    t.Id == id &&
+                    t.Project.Members.Any(
+                        m => m.UserId == userId));
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            var projectId = task.ProjectId;
+
+            //never overwrite an existing owner
+            if (task.OwnerId != null)
+            {
+                TempData["ErrorMessage"] =
+                    "This task has already been claimed.";
+
+                return RedirectToAction(
+                    nameof(Index),
+                    new { id = projectId });
+            }
+
+            //claim the task
+            task.OwnerId = userId;
+
+            //record the ownership change
+            _context.ProjectActivities.Add(new ProjectActivity
+            {
+                ProjectId = projectId,
+                TaskItemId = task.Id,
+                ActorId = userId,
+                Action = "TaskClaimed",
+                Details = $"Claimed task '{task.Title}'.",
+                OccurredAtUtc = DateTime.UtcNow
+            });
+
+            try
+            {
+                //RowVersion detects conflicting updates
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] =
+                    "Task claimed successfully.";
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                TempData["ErrorMessage"] =
+                    "This task was claimed or changed by another user. " +
+                    "Refresh the task list and try again.";
+            }
+
+            return RedirectToAction(
+                nameof(Index),
+                new { id = projectId });
+        }
     }
 }

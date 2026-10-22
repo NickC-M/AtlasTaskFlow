@@ -7,7 +7,19 @@
 }
 
 <h1>@ViewBag.ProjectName — Tasks</h1>
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success" role="status">
+        @success
+    </div>
+}
 
+@if (TempData["ErrorMessage"] is string error)
+{
+    <div class="alert alert-warning" role="alert">
+        @error
+    </div>
+}
 <p>
     <a asp-action="Create"
        asp-route-projectId="@projectId"
@@ -40,6 +52,7 @@ else
         <table class="table table-striped align-middle">
             <thead>
                 <tr>
+                    <th>Actions</th>
                     <th>Task</th>
                     <th>Status</th>
                     <th>Priority</th>
@@ -51,6 +64,7 @@ else
                 @foreach (var task in Model)
                 {
                     <tr>
+
                         <td>
                             <strong>@task.Title</strong>
                             @if (!string.IsNullOrWhiteSpace(task.Description))
@@ -71,6 +85,30 @@ else
                             @(task.DueDate?.ToString("MMM d, yyyy")
                                 ?? "No due date")
                         </td>
+
+                        <td>
+                        @if (task.OwnerId == null)
+                        {
+                            <form asp-controller="Tasks"
+                                  asp-action="Claim"
+                                  asp-route-id="@task.Id"
+                                  method="post">
+                                <button type="submit"
+                                        class="btn btn-sm btn-primary">
+                                    Claim Task
+                                </button>
+                            </form>
+                        }
+                        else if (task.OwnerId == User.FindFirst(
+                                     System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                        {
+                            <span class="text-success">Assigned to you</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Already claimed</span>
+                        }
+                    </td>
                     </tr>
                 }
             </tbody>
