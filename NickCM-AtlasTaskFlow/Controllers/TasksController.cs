@@ -353,32 +353,95 @@ namespace NickCM_AtlasTaskFlow.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddComment(
+    TaskCommentCreateViewModel model)
+        {
+            var userId = _userManager.GetUserId(User);
 
-        // GET: /Tasks/Details/12
+            if (userId == null)
+                return Challenge();
+
+            var task = await _context.TaskItems
+                .Where(t =>
+                    t.Id == model.TaskItemId &&
+                    t.Project.Members.Any(m => m.UserId == userId))
+                .Select(t => new
+                {
+                    t.Id,
+                    t.ProjectId,
+                    t.Title
+                })
+                .FirstOrDefaultAsync();
+
+            if (task == null)
+                return NotFound();
+
+            model.Content = model.Content?.Trim() ?? string.Empty;
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] =
+                    "Please enter a comment of 1–2,000 characters.";
+
+                return RedirectToAction(
+                    nameof(Details), new { id = task.Id });
+            }
+
+            var comment = new TaskComment
+            {
+                TaskItemId = task.Id,
+                AuthorId = userId,
+                Content = model.Content,
+                CreatedAtUtc = DateTime.UtcNow
+            };
+
+            _context.TaskComments.Add(comment);
+
+            _context.ProjectActivities.Add(new ProjectActivity
+            {
+                ProjectId = task.ProjectId,
+                TaskItemId = task.Id,
+                ActorId = userId,
+                Action = "TaskCommentAdded",
+                Details = $"Added a comment to task '{task.Title}'.",
+                OccurredAtUtc = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Comment added successfully.";
+
+            return RedirectToAction(nameof(Details), new { id = task.Id });
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
             var userId = _userManager.GetUserId(User);
 
             if (userId == null)
-            {
                 return Challenge();
-            }
 
             var task = await _context.TaskItems
                 .AsNoTracking()
                 .Where(t =>
                     t.Id == id &&
-                    t.Project.Members.Any(
-                        m => m.UserId == userId))
+                    t.Project.Members.Any(m => m.UserId == userId))
                 .Include(t => t.Project)
                 .Include(t => t.Owner)
+                .Include(t => t.Comments)
+                    .ThenInclude(c => c.Author)
                 .FirstOrDefaultAsync();
 
             if (task == null)
-            {
                 return NotFound();
-            }
+
+            task.Comments = task.Comments
+                .OrderByDescending(c => c.CreatedAtUtc)
+                .ToList();
 
             return View(task);
         }

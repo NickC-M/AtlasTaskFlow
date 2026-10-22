@@ -2,58 +2,172 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="container py-4">
-    <h1>Welcome to Atlas TaskFlow</h1>
-    <p class="text-muted">
-        Your workspace for organizing projects and tracking tasks.
-    </p>
+<div class="atlas-dashboard">
 
-    <div class="row g-3 mt-3">
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">My Projects</h5>
-                    <p class="card-text">
-                        View and manage your team projects.
-                    </p>
-                    <a asp-controller="Projects"
-                       asp-action="Index"
-                       class="btn btn-primary">
-                        View Projects
-                    </a>
-                </div>
+
+    <!-- Welcome banner -->
+    <section class="dashboard-hero">
+        <div class="hero-decoration" aria-hidden="true"></div>
+
+        <div class="hero-content">
+            <div class="hero-eyebrow">
+                <span aria-hidden="true">&#10022;</span>
+                YOUR WORKSPACE
             </div>
+
+            <h1 class="hero-title">
+                Welcome to AtlasTaskFlow
+            </h1>
+
+            <p class="hero-description">
+                Bring your projects, tasks, and team collaboration together
+                in one place. Stay organized, keep work moving, and turn
+                your plans into progress.
+            </p>
+
+            <a asp-controller="Projects"
+               asp-action="Index"
+               class="hero-button">
+                Explore your projects
+                <span aria-hidden="true">&rarr;</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Main dashboard actions -->
+    <div class="mb-4">
+        <h2 class="section-heading mb-1">Your workspace</h2>
+        <p class="section-description mb-0">
+            Everything you need to keep your work on track.
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Projects -->
+        <div class="col-md-6 col-xl-4">
+            <article class="dashboard-card">
+                <div class="card-icon" aria-hidden="true">
+                    &#9638;
+                </div>
+
+                <h3 class="card-title">My Projects</h3>
+
+                <p class="card-description">
+                    Bring your team's work together. Open project spaces,
+                    explore project details, and access your Kanban boards
+                    to organize tasks and track progress.
+                </p>
+
+                <a asp-controller="Projects"
+                   asp-action="Index"
+                   class="card-link">
+                    <span>View your projects</span>
+                    <span aria-hidden="true">&rarr;</span>
+                </a>
+            </article>
         </div>
 
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">My Tasks</h5>
-                    <p class="card-text">
-                        Keep track of work assigned to you.
-                    </p>
-                    <a asp-controller="Tasks"
-                       asp-action="MyTasks"
-                       class="btn btn-primary">
-                        View My Tasks
-                    </a>
+        <!-- Tasks -->
+        <div class="col-md-6 col-xl-4">
+            <article class="dashboard-card">
+                <div class="card-icon tasks" aria-hidden="true">
+                    &#10003;
                 </div>
-            </div>
+
+                <h3 class="card-title">My Tasks</h3>
+
+                <p class="card-description">
+                    Focus on the work that belongs to you. Review assigned
+                    tasks, check due dates, and keep track of what needs
+                    your attention next.
+                </p>
+
+                <a asp-controller="Tasks"
+                   asp-action="MyTasks"
+                   class="card-link">
+                    <span>View your tasks</span>
+                    <span aria-hidden="true">&rarr;</span>
+                </a>
+            </article>
         </div>
 
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Activity</h5>
-                    <p class="card-text">
-                        Review project changes and progress.
-                    </p>
-                    <span class="text-muted">
+        <!-- Activity -->
+        <div class="col-md-6 col-xl-4">
+            <article class="dashboard-card">
+                <div class="card-icon activity" aria-hidden="true">
+                    &#8635;
+                </div>
+
+                <h3 class="card-title">Project Activity</h3>
+
+                <p class="card-description">
+                    Keep an eye on changes across your workspace.
+                    A dedicated activity overview can bring task updates,
+                    comments, and ownership changes together.
+                </p>
+
+                <div class="card-link">
+                    <span class="coming-soon">
+                        <span aria-hidden="true">&#9679;</span>
                         Coming soon
                     </span>
+                    <span class="text-secondary"
+                          aria-hidden="true">&#8599;</span>
+                </div>
+            </article>
+        </div>
+
+    </div>
+
+    <!-- Workflow guide -->
+    <section class="workflow-panel">
+        <div class="mb-4">
+            <h2 class="section-heading mb-1">A simple way to get started</h2>
+            <p class="section-description mb-0">
+                Move from planning to progress in three steps.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h3 class="step-title">Open a project</h3>
+                        <p class="step-description">
+                            Choose an existing project or create one for
+                            your next piece of work.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h3 class="step-title">Organize your tasks</h3>
+                        <p class="step-description">
+                            Use the Kanban board to follow task progress,
+                            claim available work, and manage priorities.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <div>
+                        <h3 class="step-title">Collaborate and deliver</h3>
+                        <p class="step-description">
+                            Update task details and use comments to keep
+                            project discussions connected to the work.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </div>
-

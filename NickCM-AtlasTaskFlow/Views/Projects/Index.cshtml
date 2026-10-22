@@ -1,64 +1,145 @@
 ﻿@model IEnumerable<NickCM_AtlasTaskFlow.Models.Project>
 
 @{
-    ViewData["Title"] = "My Projects";
+    ViewData["Title"] = "My Projects"; var projects = Model?.ToList() ?? new List<NickCM_AtlasTaskFlow.Models.Project>();
 }
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1>My Projects</h1>
-            <p class="text-muted">Organize your team's work in Atlas TaskFlow.</p>
+<div class="atlas-projects">
+
+    <section class="projects-header">
+        <div class="projects-header-content">
+            <div class="projects-eyebrow">YOUR WORKSPACE</div>
+            <h1>Projects</h1>
+            <p>
+                Organize your team's work, manage priorities, and keep
+                every project moving forward.
+            </p>
         </div>
-        <a asp-action="Create" class="btn btn-primary">
-            Create Project
+
+        <a asp-controller="Projects"
+           asp-action="Create"
+           class="projects-create-btn">
+            <span aria-hidden="true">+</span>
+            Create project
         </a>
-    </div>
+    </section>
 
     @if (TempData["SuccessMessage"] is string message)
     {
-        <div class="alert alert-success">@message</div>
+        <div class="alert alert-success projects-alert" role="status">
+            @message
+        </div>
     }
 
-    @if (!Model.Any())
-    {
-        <div class="card">
-            <div class="card-body text-center py-5">
-                <h4>No projects yet</h4>
-                <p>Create your first project to start organizing tasks.</p>
-                <a asp-action="Create" class="btn btn-primary">
-                    Create your first project
-                </a>
-            </div>
+    <section class="projects-overview">
+        <div class="projects-overview-icon" aria-hidden="true">
+            &#9638;
         </div>
+        <div>
+            <div class="projects-overview-label">Total projects</div>
+            <div class="projects-overview-count">@projects.Count</div>
+        </div>
+        <div class="projects-overview-note">
+            @(projects.Count == 1
+                ? "One project in your workspace"
+                : $"{projects.Count} projects in your workspace")
+        </div>
+    </section>
+
+    <div class="projects-section-header">
+        <div>
+            <h2>Your projects</h2>
+            <p>Open a project to view its details and manage tasks.</p>
+        </div>
+
+        @if (projects.Count > 0)
+        {
+            <span class="projects-count-badge">
+                @projects.Count @(projects.Count == 1 ? "project" : "projects")
+            </span>
+        }
+    </div>
+
+    @if (projects.Count == 0)
+    {
+        <section class="projects-empty">
+            <div class="projects-empty-icon" aria-hidden="true">
+                &#9638;
+            </div>
+
+            <h2>Your workspace starts here</h2>
+
+            <p>
+                You haven't joined any projects yet. Create your first
+                project to start organizing tasks and collaborating
+                with your team.
+            </p>
+
+            <a asp-controller="Projects"
+               asp-action="Create"
+               class="projects-create-btn">
+                <span aria-hidden="true">+</span>
+                Create your first project
+            </a>
+        </section>
     }
     else
     {
-        <div class="row g-3">
-            @foreach (var project in Model)
+        <div class="row g-4">
+            @foreach (var project in projects)
             {
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">@project.Name</h5>
+                <div class="col-md-6 col-xl-4">
+                    <article class="project-card">
+                        <div class="project-card-accent"></div>
 
-                            <p class="card-text">
+                        <div class="project-card-body">
+                            <div class="project-card-top">
+                                <div class="project-card-icon"
+                                     aria-hidden="true">
+                                    @{
+                                        var initial =
+                                            string.IsNullOrWhiteSpace(project.Name)
+                                                ? "P"
+                                                : project.Name.Trim()
+                                                    .Substring(0, 1)
+                                                    .ToUpperInvariant();
+                                    }
+                                    @initial
+                                </div>
+
+                                <span class="project-type-label">
+                                    PROJECT
+                                </span>
+                            </div>
+
+                            <h3 class="project-card-title">
+                                @project.Name
+                            </h3>
+
+                            <p class="project-card-description">
                                 @(string.IsNullOrWhiteSpace(project.Description)
-                                    ? "No description provided."
+                                    ? "No description has been added to this project yet."
                                     : project.Description)
                             </p>
 
-                            <p class="text-muted small">
-                                Created @project.CreatedAtUtc.ToLocalTime().ToString("MMM d, yyyy")
-                            </p>
+                            <div class="project-card-meta">
+                                <span aria-hidden="true">&#128197;</span>
+                                Created
+                                @project.CreatedAtUtc.ToLocalTime()
+                                .ToString("MMM d, yyyy")
+                            </div>
 
-                            <a asp-action="Details"
-                               asp-route-id="@project.Id"
-                               class="btn btn-outline-primary">
-                                Open Project
-                            </a>
+                            <div class="project-card-footer">
+                                <a asp-controller="Projects"
+                                   asp-action="Details"
+                                   asp-route-id="@project.Id"
+                                   class="project-open-link">
+                                    Open project
+                                    <span aria-hidden="true">&rarr;</span>
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                    </article>
                 </div>
             }
         </div>
