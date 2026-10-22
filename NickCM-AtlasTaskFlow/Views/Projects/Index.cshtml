@@ -1,0 +1,66 @@
+﻿@model IEnumerable<NickCM_AtlasTaskFlow.Models.Project>
+
+@{
+    ViewData["Title"] = "My Projects";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>My Projects</h1>
+            <p class="text-muted">Organize your team's work in Atlas TaskFlow.</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary">
+            Create Project
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] is string message)
+    {
+        <div class="alert alert-success">@message</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <h4>No projects yet</h4>
+                <p>Create your first project to start organizing tasks.</p>
+                <a asp-action="Create" class="btn btn-primary">
+                    Create your first project
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var project in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">@project.Name</h5>
+
+                            <p class="card-text">
+                                @(string.IsNullOrWhiteSpace(project.Description)
+                                    ? "No description provided."
+                                    : project.Description)
+                            </p>
+
+                            <p class="text-muted small">
+                                Created @project.CreatedAtUtc.ToLocalTime().ToString("MMM d, yyyy")
+                            </p>
+
+                            <a asp-action="Details"
+                               asp-route-id="@project.Id"
+                               class="btn btn-outline-primary">
+                                Open Project
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

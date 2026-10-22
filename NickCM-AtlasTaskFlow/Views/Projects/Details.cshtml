@@ -1,0 +1,121 @@
+﻿@model NickCM_AtlasTaskFlow.Models.Project
+
+@{
+    ViewData["Title"] = Model.Name;
+    var totalTasks = Model.Tasks.Count;
+    var completedTasks = Model.Tasks.Count(t =>
+        t.Status == NickCM_AtlasTaskFlow.Models.TaskStatus.Completed);
+    var progress = totalTasks == 0
+        ? 0
+        : (int)Math.Round(completedTasks * 100.0 / totalTasks);
+}
+
+<div class="container py-4">
+    <div class="mb-3">
+        <a asp-action="Index" class="text-decoration-none">
+            &larr; Back to My Projects
+        </a>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1>@Model.Name</h1>
+            <p class="text-muted">
+                @(Model.Description ?? "No description provided.")
+            </p>
+        </div>
+        <span class="badge bg-primary">Project</span>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total tasks</p>
+                    <h2>@totalTasks</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Completed</p>
+                    <h2>@completedTasks</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Project progress</p>
+                    <h2>@progress%</h2>
+                    <div class="progress"
+                         role="progressbar"
+                         aria-valuenow="@progress"
+                         aria-valuemin="0"
+                         aria-valuemax="100">
+                        <div class="progress-bar"
+                             style="width: @progress%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Team Members</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            @foreach (var member in Model.Members)
+            {
+                <li class="list-group-item">
+                    @(member.User.DisplayName
+                        ?? member.User.Email
+                        ?? "Team member")
+                    <span class="text-muted ms-2">
+                        @member.Role
+                    </span>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Tasks</h5>
+            <span class="text-muted">@totalTasks total</span>
+        </div>
+
+        @if (!Model.Tasks.Any())
+        {
+            <div class="card-body">
+                <p class="text-muted mb-0">
+                    No tasks have been created for this project yet.
+                </p>
+            </div>
+        }
+        else
+        {
+            <div class="list-group list-group-flush">
+                @foreach (var task in Model.Tasks.OrderBy(t => t.DueDate))
+                {
+                    <div class="list-group-item">
+                        <strong>@task.Title</strong>
+                        <span class="badge bg-secondary ms-2">
+                            @task.Status
+                        </span>
+                        @if (task.DueDate.HasValue)
+                        {
+                            <div class="small text-muted">
+                                Due @task.DueDate.Value.ToString("MMM d, yyyy")
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
