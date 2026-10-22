@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container py-4">
+    <h1>Welcome to Atlas TaskFlow</h1>
+    <p class="text-muted">
+        Your workspace for organizing projects and tracking tasks.
+    </p>
+
+    <div class="row g-3 mt-3">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">My Projects</h5>
+                    <p class="card-text">
+                        View and manage your team projects.
+                    </p>
+                    <a asp-controller="Projects"
+                       asp-action="Index"
+                       class="btn btn-primary">
+                        View Projects
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">My Tasks</h5>
+                    <p class="card-text">
+                        Keep track of work assigned to you.
+                    </p>
+                    <a asp-controller="Tasks"
+                       asp-action="MyTasks"
+                       class="btn btn-primary">
+                        View My Tasks
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Activity</h5>
+                    <p class="card-text">
+                        Review project changes and progress.
+                    </p>
+                    <span class="text-muted">
+                        Coming soon
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
