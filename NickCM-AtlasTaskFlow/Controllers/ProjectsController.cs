@@ -70,8 +70,6 @@ namespace NickCM_AtlasTaskFlow.Controllers
                 return Challenge();
             }
 
-            await using var transaction =
-                await _context.Database.BeginTransactionAsync();
 
             var project = new Project
             {
@@ -101,7 +99,7 @@ namespace NickCM_AtlasTaskFlow.Controllers
             _context.Projects.Add(project);
 
             await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
+
 
             TempData["SuccessMessage"] =
                 "Project created successfully.";
@@ -122,6 +120,7 @@ namespace NickCM_AtlasTaskFlow.Controllers
                 .Include(p => p.Members)
                     .ThenInclude(m => m.User)
                 .Include(p => p.Tasks)
+                    .ThenInclude(t => t.Owner)
                 .FirstOrDefaultAsync();
 
             if (project == null)
