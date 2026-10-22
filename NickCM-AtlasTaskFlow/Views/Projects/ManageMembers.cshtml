@@ -1,0 +1,98 @@
+﻿@model NickCM_AtlasTaskFlow.ViewModels.AddProjectMemberViewModel
+@using NickCM_AtlasTaskFlow.Models
+
+@{
+    ViewData["Title"] = "Manage Members";
+}
+
+<h1>Manage Members</h1>
+<h4>@ViewBag.ProjectName</h4>
+
+<hr />
+
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success" role="status">
+        @success
+    </div>
+}
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Add a team member</h5>
+
+        <p class="text-muted">
+            Enter the email address of an existing AtlasTaskForce user.
+        </p>
+
+        <form asp-action="ManageMembers" method="post">
+            <input asp-for="ProjectId" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email"
+                       type="email"
+                       class="form-control" />
+                <span asp-validation-for="Email"
+                      class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Add Member
+            </button>
+
+            <a asp-action="Details"
+               asp-route-id="@Model.ProjectId"
+               class="btn btn-secondary">
+                Back to Project
+            </a>
+        </form>
+    </div>
+</div>
+
+<h5>Current Members</h5>
+
+@if (ViewBag.Members is IEnumerable<ProjectMember> members
+    && members.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Joined</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var member in members)
+                {
+                    <tr>
+                        <td>
+                            @(member.User.DisplayName
+                                ?? member.User.UserName
+                                ?? "Unknown")
+                        </td>
+                        <td>@member.User.Email</td>
+                        <td>@member.Role</td>
+                        <td>
+                            @member.JoinedAtUtc.ToString("MMM d, yyyy")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p>No members found.</p>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
