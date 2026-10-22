@@ -5,7 +5,7 @@ using NickCM_AtlasTaskFlow.Models;
 
 namespace NickCM_AtlasTaskFlow.Data
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext(options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
         public DbSet<Project> Projects => Set<Project>();
 
