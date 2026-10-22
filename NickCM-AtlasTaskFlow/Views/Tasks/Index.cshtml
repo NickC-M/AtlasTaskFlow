@@ -1,0 +1,79 @@
+﻿@model IEnumerable<NickCM_AtlasTaskFlow.Models.TaskItem>
+@using NickCM_AtlasTaskFlow.Models
+
+@{
+    ViewData["Title"] = "Project Tasks";
+    var projectId = (int)ViewBag.ProjectId;
+}
+
+<h1>@ViewBag.ProjectName — Tasks</h1>
+
+<p>
+    <a asp-action="Create"
+       asp-route-projectId="@projectId"
+       class="btn btn-primary">
+        Create Task
+    </a>
+
+    <a asp-controller="Projects"
+       asp-action="Details"
+       asp-route-id="@projectId"
+       class="btn btn-secondary">
+        Back to Project
+    </a>
+</p>
+
+@if (TempData["SuccessMessage"] is string message)
+{
+    <div class="alert alert-success" role="status">
+        @message
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <p>No tasks have been created for this project yet.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Owner</th>
+                    <th>Due Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@task.Title</strong>
+                            @if (!string.IsNullOrWhiteSpace(task.Description))
+                            {
+                                <div class="text-muted small">
+                                    @task.Description
+                                </div>
+                            }
+                        </td>
+                        <td>@task.Status</td>
+                        <td>@task.Priority</td>
+                        <td>
+                            @(task.Owner?.DisplayName
+                                ?? task.Owner?.Email
+                                ?? "Unclaimed")
+                        </td>
+                        <td>
+                            @(task.DueDate?.ToString("MMM d, yyyy")
+                                ?? "No due date")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

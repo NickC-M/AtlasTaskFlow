@@ -1,0 +1,71 @@
+﻿@model NickCM_AtlasTaskFlow.ViewModels.TaskCreateViewModel
+@using NickCM_AtlasTaskFlow.Models
+
+@{
+    ViewData["Title"] = "Create Task";
+}
+
+<h1>Create Task</h1>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger"></div>
+
+    <input asp-for="ProjectId" type="hidden" />
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title"
+              class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description"
+                  class="form-control"
+                  rows="4"></textarea>
+        <span asp-validation-for="Description"
+              class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Priority" class="form-label"></label>
+        <select asp-for="Priority"
+                asp-items="Html.GetEnumSelectList<TaskPriority>()"
+                class="form-select"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DueDate" class="form-label"></label>
+        <input asp-for="DueDate" class="form-control" />
+        <span asp-validation-for="DueDate"
+              class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="OwnerId" class="form-label"></label>
+        <select asp-for="OwnerId"
+                asp-items="ViewBag.Members"
+                class="form-select">
+            <option value="">Leave unassigned</option>
+        </select>
+        <span asp-validation-for="OwnerId"
+              class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Create Task
+    </button>
+
+    <a asp-controller="Projects"
+       asp-action="Details"
+       asp-route-id="@Model.ProjectId"
+       class="btn btn-secondary">
+        Cancel
+    </a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
