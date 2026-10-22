@@ -244,9 +244,8 @@ namespace NickCM_AtlasTaskFlow.Controllers
                     "Refresh the task list and try again.";
             }
 
-            return RedirectToAction(
-                nameof(Index),
-                new { id = projectId });
+            return RedirectToAction(nameof(Details), new { id = task.Id });
+
         }
 
 
@@ -383,5 +382,141 @@ namespace NickCM_AtlasTaskFlow.Controllers
 
             return View(task);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+                return Challenge();
+
+            var task = await _context.TaskItems
+                .AsNoTracking()
+                .Where(t =>
+                    t.Id == id &&
+                    t.Project.Members.Any(m => m.UserId == userId))
+                .FirstOrDefaultAsync();
+
+            if (task == null)
+                return NotFound();
+
+            await PopulateMembersAsync(task.ProjectId);
+
+            var model = new TaskEditViewModel
+            {
+                Id = task.Id,
+                ProjectId = task.ProjectId,
+                Title = task.Title,
+                Description = task.Description,
+                DueDate = task.DueDate,
+                Priority = task.Priority,
+                Status = task.Status,
+                OwnerId = task.OwnerId
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(TaskEditViewModel model)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+                return Challenge();
+
+            // Load the task using its actual project ID.
+            var task = await _context.TaskItems
+                .Where(t =>
+                    t.Id == model.Id &&
+                    t.Project.Members.Any(m => m.UserId == userId))
+                .FirstOrDefaultAsync();
+
+            if (task == null)
+                return NotFound();
+
+            // Validate the selected owner against the actual project.
+            if (model.OwnerId != null &&
+                !await IsProjectMemberAsync(task.ProjectId, model.OwnerId))
+            {
+                ModelState.AddModelError(
+                    nameof(model.OwnerId),
+                    "The selected user is not a member of this project.");
+            }
+
+            if (!Enum.IsDefined(typeof(TaskPriority), model.Priority))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Priority), "Invalid priority.");
+            }
+
+            if (!Enum.IsDefined(typeof(TaskStatus), model.Status))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Status), "Invalid status.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await PopulateMembersAsync(task.ProjectId);
+                return View(model);
+            }
+
+            var oldTitle = task.Title;
+            var oldStatus = task.Status;
+            var oldOwnerId = task.OwnerId;
+
+            task.Title = model.Title.Trim();
+            task.Description = model.Description?.Trim();
+            task.DueDate = model.DueDate;
+            task.Priority = model.Priority;
+            task.Status = model.Status;
+            task.OwnerId = model.OwnerId;
+
+            _context.ProjectActivities.Add(new ProjectActivity
+            {
+                ProjectId = task.ProjectId,
+                TaskItemId = task.Id,
+                ActorId = userId,
+                Action = "TaskUpdated",
+                Details = $"Updated task '{oldTitle}'.",
+                OccurredAtUtc = DateTime.UtcNow
+            });
+
+            if (oldStatus != task.Status)
+            {
+                _context.ProjectActivities.Add(new ProjectActivity
+                {
+                    ProjectId = task.ProjectId,
+                    TaskItemId = task.Id,
+                    ActorId = userId,
+                    Action = "TaskStatusChanged",
+                    Details = $"Changed status from {oldStatus} to {task.Status}.",
+                    OccurredAtUtc = DateTime.UtcNow
+                });
+            }
+
+            if (oldOwnerId != task.OwnerId)
+            {
+                _context.ProjectActivities.Add(new ProjectActivity
+                {
+                    ProjectId = task.ProjectId,
+                    TaskItemId = task.Id,
+                    ActorId = userId,
+                    Action = "TaskOwnershipChanged",
+                    Details = "Changed task ownership.",
+                    OccurredAtUtc = DateTime.UtcNow
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Task updated successfully.";
+
+            return RedirectToAction(nameof(Details), new { id = task.Id });
+        }
+
     }
 }

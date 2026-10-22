@@ -1,0 +1,86 @@
+﻿@model NickCM_AtlasTaskFlow.ViewModels.TaskEditViewModel
+@using NickCM_AtlasTaskFlow.Models
+@using TaskStatus = NickCM_AtlasTaskFlow.Models.TaskStatus
+
+@{
+    ViewData["Title"] = "Edit Task";
+}
+
+<h1 class="mb-4">Edit Task</h1>
+
+<form asp-controller="Tasks" asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description"
+                  class="form-control"
+                  rows="5"></textarea>
+        <span asp-validation-for="Description"
+              class="text-danger"></span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6 mb-3">
+            <label asp-for="DueDate" class="form-label">Due date</label>
+            <input asp-for="DueDate" type="date" class="form-control" />
+            <span asp-validation-for="DueDate" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Priority" class="form-label"></label>
+            <select asp-for="Priority"
+                    asp-items="Html.GetEnumSelectList<TaskPriority>()"
+                    class="form-select">
+            </select>
+            <span asp-validation-for="Priority" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status"
+                    asp-items="Html.GetEnumSelectList<TaskStatus>()"
+                    class="form-select">
+            </select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="OwnerId" class="form-label">Assigned user</label>
+            <select asp-for="OwnerId"
+                    asp-items="ViewBag.Members"
+                    class="form-select">
+                <option value="">Unclaimed</option>
+            </select>
+            <span asp-validation-for="OwnerId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+        <button type="submit" class="btn btn-primary">
+            Save Changes
+        </button>
+
+        <a asp-controller="Tasks"
+           asp-action="Details"
+           asp-route-id="@Model.Id"
+           class="btn btn-outline-secondary">
+            Cancel
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
