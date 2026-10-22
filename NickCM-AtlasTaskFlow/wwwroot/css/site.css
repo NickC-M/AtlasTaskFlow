@@ -29,3 +29,91 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(230px, 1fr));
+    gap: 1rem;
+    align-items: start;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+}
+
+.kanban-column {
+    min-width: 230px;
+    background: #f1f3f5;
+    border-radius: 12px;
+    padding: 0.85rem;
+}
+
+.kanban-column-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.85rem;
+}
+
+    .kanban-column-header h2 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+.kanban-dropzone {
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-radius: 8px;
+    padding: 0.2rem;
+    transition: background-color 0.15s ease;
+}
+
+    .kanban-dropzone.drag-over {
+        background: #dbeafe;
+        outline: 2px dashed #2563eb;
+    }
+
+.task-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 9px;
+    padding: 0.9rem;
+    cursor: grab;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 6%);
+}
+
+    .task-card:active {
+        cursor: grabbing;
+    }
+
+    .task-card.dragging {
+        opacity: 0.45;
+    }
+
+.task-card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    margin: 0 0 0.65rem;
+}
+
+.task-description {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 0.75rem;
+    overflow-wrap: anywhere;
+}
+
+.task-card-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    margin-top: 0.75rem;
+}
+
+@media (max-width: 900px) {
+    .kanban-board {
+        grid-template-columns: repeat(4, minmax(230px, 1fr));
+    }
+}

@@ -1,0 +1,143 @@
+﻿@model IEnumerable<NickCM_AtlasTaskFlow.Models.TaskItem>
+@using NickCM_AtlasTaskFlow.Models
+@using TaskStatus = NickCM_AtlasTaskFlow.Models.TaskStatus
+
+@{
+    ViewData["Title"] = "Kanban Board";
+    var projectId = (int)ViewBag.ProjectId;
+    var tasks = Model.ToList();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>@ViewBag.ProjectName</h1>
+        <p class="text-muted mb-0">Project task board</p>
+    </div>
+
+    <a asp-controller="Tasks"
+       asp-action="Create"
+       asp-route-projectId="@projectId"
+       class="btn btn-primary">
+        + Create Task
+    </a>
+</div>
+
+@if (TempData["ErrorMessage"] is string error)
+{
+    <div class="alert alert-warning" role="alert">
+        @error
+    </div>
+}
+
+<div class="mb-3">
+    <a asp-controller="Projects"
+       asp-action="Details"
+       asp-route-id="@projectId"
+       class="btn btn-outline-secondary btn-sm">
+        Back to Project
+    </a>
+</div>
+
+<form id="antiforgery-form"
+      asp-controller="Tasks"
+      asp-action="UpdateStatus"
+      method="post">
+    @Html.AntiForgeryToken()
+</form>
+
+<div id="board-message"
+     class="alert alert-warning d-none"
+     role="alert"></div>
+
+<div class="kanban-board">
+    @foreach (var status in new[]
+    {
+        TaskStatus.ToDo,
+        TaskStatus.InProgress,
+        TaskStatus.Review,
+        TaskStatus.Completed
+    })
+    {
+        var columnTasks = tasks
+            .Where(t => t.Status == status)
+            .ToList();
+
+        <section class="kanban-column"
+                 data-status="@status">
+
+            <div class="kanban-column-header">
+                <h2>@status</h2>
+                <span class="badge bg-secondary task-count">
+                    @columnTasks.Count
+                </span>
+            </div>
+
+            <div class="kanban-dropzone"
+                 data-status="@status">
+
+                @foreach (var task in columnTasks)
+                {
+                    <article class="task-card"
+                             draggable="true"
+                             data-task-id="@task.Id">
+
+                        <div class="d-flex justify-content-between
+                                    align-items-start gap-2">
+                            <h3 class="task-card-title">
+                                @task.Title
+                            </h3>
+
+                            <span class="badge @(
+                                task.Priority switch
+                                {
+                                    TaskPriority.Critical => "bg-danger",
+                                    TaskPriority.High => "bg-warning text-dark",
+                                    TaskPriority.Medium => "bg-primary",
+                                    _ => "bg-secondary"
+                                })">
+                                @task.Priority
+                            </span>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(task.Description))
+                        {
+                            <p class="task-description">
+                                @task.Description
+                            </p>
+                        }
+
+                        <div class="task-card-footer">
+                            <span>
+                                @(task.Owner?.DisplayName
+                                    ?? task.Owner?.Email
+                                    ?? "Unclaimed")
+                            </span>
+
+                            @if (task.DueDate.HasValue)
+                            {
+                                <span class="@(task.DueDate.Value.Date
+                                    < DateTime.Today &&
+                                    task.Status != TaskStatus.Completed
+                                    ? "text-danger fw-bold"
+                                    : "text-muted")">
+                                    Due @task.DueDate.Value.ToString("MMM d")
+                                </span>
+                            }
+                        </div>
+                        <a asp-controller="Tasks"
+                           asp-action="Details"
+                           asp-route-id="@task.Id"
+                           class="btn btn-sm btn-outline-primary mt-3">
+                            View Details
+                        </a>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/kanban.js"
+            asp-append-version="true"></script>
+}

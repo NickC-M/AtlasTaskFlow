@@ -37,6 +37,12 @@
        class="btn btn-outline-primary">
         Manage Members
     </a>
+    <a asp-controller="Tasks"
+       asp-action="Board"
+       asp-route-id="@Model.Id"
+       class="btn btn-primary">
+        Open Kanban Board
+    </a>
 
     <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
