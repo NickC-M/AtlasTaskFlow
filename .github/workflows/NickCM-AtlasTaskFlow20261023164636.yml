@@ -23,13 +23,13 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
     - name: Restore dependencies
-      run: dotnet restore "NickCM_AtlasTaskFlow/NickCM_AtlasTaskFlow.csproj"
+      run: dotnet restore "NickCM-AtlasTaskFlow/NickCM-AtlasTaskFlow.csproj"
     - name: Build
-      run: dotnet build "NickCM_AtlasTaskFlow/NickCM_AtlasTaskFlow.csproj" --no-restore
+      run: dotnet build "NickCM-AtlasTaskFlow/NickCM-AtlasTaskFlow.csproj" --no-restore
     - name: Test
-      run: dotnet test "${{ env.WORKING_DIRECTORY }}" --no-build
+      run: dotnet test "NickCM-AtlasTaskFlow/NickCM-AtlasTaskFlow.csproj" --no-build
     - name: Publish
-      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+      run: dotnet publish "NickCM-AtlasTaskFlow/NickCM-AtlasTaskFlow.csproj" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
       with:
