@@ -1554,3 +1554,15 @@ padding: 0.8rem 1rem;
         font-size: 1.9rem;
     }
 }
+.project-dates {
+    padding: 14px 18px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+}
+
+.project-dates strong {
+    display: inline-block;
+    margin-top: 4px;
+    color: #212529;
+}

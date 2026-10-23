@@ -125,8 +125,7 @@
                             <div class="project-card-meta">
                                 <span aria-hidden="true">&#128197;</span>
                                 Created
-                                @project.CreatedAtUtc.ToLocalTime()
-                                .ToString("MMM d, yyyy")
+                                @(project.CreatedAtUtc.ToLocalTime().ToString("MMM d, yyyy"))
                             </div>
 
                             <div class="project-card-footer">

@@ -23,7 +23,7 @@ namespace NickCM_AtlasTaskFlow.Controllers
             _userManager = userManager;
         }
 
-        //GET: /Projects
+
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
@@ -38,13 +38,80 @@ namespace NickCM_AtlasTaskFlow.Controllers
             return View(projects);
         }
 
-        //GET: /Projects/Create
+
         public IActionResult Create()
         {
             return View();
         }
 
-        //POST: /Projects/Create
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+                return Challenge();
+
+            var project = await _context.Projects
+                .AsNoTracking()
+                .Where(p =>
+                    p.Id == id &&
+                    p.Members.Any(m =>
+                        m.UserId == userId &&
+                        m.Role == ProjectRole.Manager))
+                .FirstOrDefaultAsync();
+
+            if (project == null)
+                return NotFound();
+
+            var model = new ProjectEditViewModel
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                EndDate = project.EndDate
+            };
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(ProjectEditViewModel model)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+                return Challenge();
+
+            var project = await _context.Projects
+                .Where(p =>
+                    p.Id == model.Id &&
+                    p.Members.Any(m =>
+                        m.UserId == userId &&
+                        m.Role == ProjectRole.Manager))
+                .FirstOrDefaultAsync();
+
+            if (project == null)
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            project.Name = model.Name.Trim();
+            project.Description = model.Description?.Trim();
+            project.EndDate = model.EndDate;
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Project updated successfully.";
+
+            return RedirectToAction(nameof(Details), new { id = project.Id });
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -109,7 +176,7 @@ namespace NickCM_AtlasTaskFlow.Controllers
                 new { id = project.Id });
         }
 
-        //GET: /Projects/Details/5
+
         public async Task<IActionResult> Details(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -132,7 +199,7 @@ namespace NickCM_AtlasTaskFlow.Controllers
             return View(project);
         }
 
-        // Checks whether the current user manages this project.
+        //checks if current user manages this project
         private async Task<bool> IsProjectManagerAsync(
             int projectId, string userId)
         {
@@ -142,7 +209,7 @@ namespace NickCM_AtlasTaskFlow.Controllers
                 pm.Role == ProjectRole.Manager);
         }
 
-        // GET: /Projects/ManageMembers/5
+
         [HttpGet]
         public async Task<IActionResult> ManageMembers(int id)
         {
@@ -181,7 +248,7 @@ namespace NickCM_AtlasTaskFlow.Controllers
             });
         }
 
-        // POST: /Projects/ManageMembers
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ManageMembers(
