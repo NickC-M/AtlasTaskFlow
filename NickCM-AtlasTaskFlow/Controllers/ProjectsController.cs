@@ -210,6 +210,70 @@ namespace NickCM_AtlasTaskFlow.Controllers
         }
 
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+                return Challenge();
+
+            var project = await _context.Projects
+                .Where(p =>
+                    p.Id == id &&
+                    p.Members.Any(m =>
+                        m.UserId == userId &&
+                        m.Role == ProjectRole.Manager))
+                .FirstOrDefaultAsync();
+
+            if (project == null)
+                return NotFound();
+
+            //find all tasks belonging to this project
+            var tasks = await _context.TaskItems
+                .Where(t => t.ProjectId == id)
+                .ToListAsync();
+
+            var taskIds = tasks.Select(t => t.Id).ToList();
+
+            //remove comments belonging to those tasks
+            var comments = await _context.TaskComments
+                .Where(c => taskIds.Contains(c.TaskItemId))
+                .ToListAsync();
+
+            _context.TaskComments.RemoveRange(comments);
+
+            //remove activity records referencing this project
+            var activities = await _context.ProjectActivities
+                .Where(a => a.ProjectId == id)
+                .ToListAsync();
+
+            _context.ProjectActivities.RemoveRange(activities);
+
+            //remove project memberships
+            var members = await _context.ProjectMembers
+                .Where(m => m.ProjectId == id)
+                .ToListAsync();
+
+            _context.ProjectMembers.RemoveRange(members);
+
+            //remove the project's tasks
+            _context.TaskItems.RemoveRange(tasks);
+
+            //remove project once everything attached is gone
+            _context.Projects.Remove(project);
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Project deleted successfully.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
+
         [HttpGet]
         public async Task<IActionResult> ManageMembers(int id)
         {

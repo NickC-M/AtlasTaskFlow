@@ -70,8 +70,25 @@
                            class="btn btn-outline-secondary">
                             Cancel
                         </a>
+
+
                     </div>
+
                 </form>
+
+                <form asp-controller="Projects"
+                      asp-action="Delete"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      onsubmit="return confirm('Are you sure you want to delete this project? This will permanently delete the project and its associated tasks. This action cannot be undone.');">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit" class="btn btn-danger">
+                        <icon name="trash-2" size="sm" /> Delete Project
+                    </button>
+                </form>
+
             </div>
         </div>
     </div>

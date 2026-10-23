@@ -27,6 +27,21 @@
             <p class="project-description">
                 @(Model.Description ?? "No description provided.")
             </p>
+            <div class="project-dates d-flex flex-wrap gap-4 mt-3 mb-2">
+                <div>
+                    <span class="text-muted small d-block">Start Date</span>
+                    <strong>
+                        @(Model.StartDate?.ToString("MMM d, yyyy") ?? "Not set")
+                    </strong>
+                </div>
+
+                <div>
+                    <span class="text-muted small d-block">End Date</span>
+                    <strong>
+                        @(Model.EndDate?.ToString("MMM d, yyyy") ?? "Not set")
+                    </strong>
+                </div>
+            </div>
         </div>
         <span class="project-type-badge">Project</span>
     </div>
