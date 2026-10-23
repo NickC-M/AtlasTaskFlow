@@ -76,7 +76,7 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-body">
                 <h5 class="card-title">Task information</h5>
 
@@ -108,7 +108,29 @@
                     </dd>
                 </dl>
             </div>
+
         </div>
+        <div>
+
+        </div>
+         <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Priority</h5>
+
+                <span class="badge fs-6 @(
+                    Model.Priority switch
+                    {
+                        TaskPriority.Critical => "bg-danger",
+                        TaskPriority.High => "bg-warning text-dark",
+                        TaskPriority.Medium => "bg-primary",
+                        _ => "bg-secondary"
+                    })">
+                    @Model.Priority
+                </span>
+            </div>
+        </div>
+
+
     </div>
     <div class="card mt-4">
     <div class="card-body">
@@ -250,21 +272,6 @@
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Priority</h5>
-
-                <span class="badge fs-6 @(
-                    Model.Priority switch
-                    {
-                        TaskPriority.Critical => "bg-danger",
-                        TaskPriority.High => "bg-warning text-dark",
-                        TaskPriority.Medium => "bg-primary",
-                        _ => "bg-secondary"
-                    })">
-                    @Model.Priority
-                </span>
-            </div>
-        </div>
+       
     </div>
 </div>

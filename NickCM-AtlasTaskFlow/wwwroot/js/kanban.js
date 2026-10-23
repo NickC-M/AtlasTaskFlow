@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let draggedCard = null;
 
-    // Start dragging a task
+    //start dragging a task
     board.addEventListener("dragstart", event => {
         const card = event.target.closest(".task-card");
 
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ".kanban-dropzone"
         );
 
-        //no update is needed if dropped in the same column
+        //no update if dropped in the same column
         if (currentColumn?.dataset.status === newStatus) {
             return;
         }

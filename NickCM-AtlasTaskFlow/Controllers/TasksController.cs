@@ -490,7 +490,7 @@ namespace NickCM_AtlasTaskFlow.Controllers
             if (userId == null)
                 return Challenge();
 
-            // Load the task using its actual project ID.
+            //load the task using project ID
             var task = await _context.TaskItems
                 .Where(t =>
                     t.Id == model.Id &&
@@ -500,7 +500,7 @@ namespace NickCM_AtlasTaskFlow.Controllers
             if (task == null)
                 return NotFound();
 
-            // Validate the selected owner against the actual project.
+            //validate selected owner against project
             if (model.OwnerId != null &&
                 !await IsProjectMemberAsync(task.ProjectId, model.OwnerId))
             {

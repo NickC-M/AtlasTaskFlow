@@ -1,0 +1,63 @@
+﻿<nav class="navbar navbar-expand-lg atlas-navbar">
+    <div class="atlas-container w-100 d-flex align-items-center justify-content-between py-2">
+
+        
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="atlas-brand">
+            <span class="atlas-logo">A</span>
+            <span>AtlasTaskFlow</span>
+        </a>
+
+        
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#atlasAppNavigation"
+                aria-controls="atlasAppNavigation"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- navigation -->
+        <div class="collapse navbar-collapse" id="atlasAppNavigation">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3 mt-3 mt-lg-0">
+
+                <li class="nav-item">
+                    <a asp-controller="Dashboard"
+                       asp-action="Index"
+                       class="nav-link">
+                        Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Projects"
+                       asp-action="Index"
+                       class="nav-link">
+                        My Projects
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Tasks"
+                       asp-action="MyTasks"
+                       class="nav-link">
+                        My Tasks
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a asp-controller="Home"
+                       asp-action="Index"
+                       class="nav-link">
+                        Home
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+    </div>
+</nav>

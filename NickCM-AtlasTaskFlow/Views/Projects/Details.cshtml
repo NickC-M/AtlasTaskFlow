@@ -10,75 +10,78 @@
         : (int)Math.Round(completedTasks * 100.0 / totalTasks);
 }
 
-<div class="container py-4">
-    <div class="mb-3">
-        <a asp-action="Index" class="text-decoration-none">
+<div class="container py-4 project-details-page">
+    <div class="project-back mb-4">
+        <a asp-action="Index" class="project-back-link">
             &larr; Back to My Projects
         </a>
     </div>
 
 
-    <a asp-controller="Tasks"
-       asp-action="Index"
-       asp-route-id="@Model.Id"
-       class="btn btn-primary">
-        View Tasks
-    </a>
+    
 
-    <a asp-controller="Tasks"
-       asp-action="Create"
-       asp-route-projectId="@Model.Id"
-       class="btn btn-outline-primary">
-        Create Task
-    </a>
-    <a asp-controller="Projects"
-       asp-action="ManageMembers"
-       asp-route-id="@Model.Id"
-       class="btn btn-outline-primary">
-        Manage Members
-    </a>
-    <a asp-controller="Tasks"
-       asp-action="Board"
-       asp-route-id="@Model.Id"
-       class="btn btn-primary">
-        Open Kanban Board
-    </a>
-
-    <div class="d-flex justify-content-between align-items-start mb-4">
+    <div class="project-heading d-flex justify-content-between align-items-start mb-4">
         <div>
-            <h1>@Model.Name</h1>
-            <p class="text-muted">
+            <div class="project-eyebrow">PROJECT WORKSPACE</div>
+            <h1 class="project-title">@Model.Name</h1>
+            <p class="project-description">
                 @(Model.Description ?? "No description provided.")
             </p>
         </div>
-        <span class="badge bg-primary">Project</span>
+        <span class="project-type-badge">Project</span>
     </div>
+    <div  class="project-actions d-flex flex-wrap gap-2 mb-4">
+        <a asp-controller="Tasks"
+           asp-action="Index"
+           asp-route-id="@Model.Id"
+           class="btn btn-atlas project-btn-primary">
+            View Tasks
+        </a>
 
+        <a asp-controller="Tasks"
+           asp-action="Create"
+           asp-route-projectId="@Model.Id"
+           class="btn btn-outline-atlas">
+            Create Task
+        </a>
+        <a asp-controller="Projects"
+           asp-action="ManageMembers"
+           asp-route-id="@Model.Id"
+           class="btn btn-outline-atlas">
+            Manage Members
+        </a>
+        <a asp-controller="Tasks"
+           asp-action="Board"
+           asp-route-id="@Model.Id"
+           class="btn btn-atlas project-btn-primary">
+            Open Kanban Board
+        </a>
+    </div>
     <div class="row g-3 mb-4">
         <div class="col-md-4">
-            <div class="card h-100">
+            <div class="card h-100 project-stat-card">
                 <div class="card-body">
-                    <p class="text-muted mb-1">Total tasks</p>
-                    <h2>@totalTasks</h2>
+                    <p class="project-stat-label mb-1">Total tasks</p>
+                    <h2 class="project-stat-number">@totalTasks</h2>
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card h-100">
+            <div class="card h-100 project-stat-card">
                 <div class="card-body">
-                    <p class="text-muted mb-1">Completed</p>
-                    <h2>@completedTasks</h2>
+                    <p class="project-stat-label mb-1">Completed</p>
+                    <h2 class="project-stat-number">@completedTasks</h2>
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card h-100">
+            <div class="card h-100 project-stat-card">
                 <div class="card-body">
                     <p class="text-muted mb-1">Project progress</p>
                     <h2>@progress%</h2>
-                    <div class="progress"
+                    <div class="progress project-progress-bar"
                          role="progressbar"
                          aria-valuenow="@progress"
                          aria-valuemin="0"
@@ -91,8 +94,8 @@
         </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-header">
+    <div class="card mb-4 project-panel">
+        <div class="card-header project-panel-header">
             <h5 class="mb-0">Team Members</h5>
         </div>
         <ul class="list-group list-group-flush">
@@ -110,8 +113,8 @@
         </ul>
     </div>
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card project-panel">
+        <div class="card-header d-flex justify-content-between align-items-center project-panel-header">
             <h5 class="mb-0">Tasks</h5>
             <span class="text-muted">@totalTasks total</span>
         </div>
@@ -129,7 +132,7 @@
             <div class="list-group list-group-flush">
                 @foreach (var task in Model.Tasks.OrderBy(t => t.DueDate))
                 {
-                    <div class="list-group-item">
+                    <div class="list-group-item project-task-row">
                         <strong>@task.Title</strong>
                         <span class="badge bg-secondary ms-2">
                             @task.Status
