@@ -32,7 +32,8 @@ namespace NickCM_AtlasTaskFlow.Controllers
                       pm.UserId == userId);
         }
 
-        //GET: /Tasks/Index/5
+
+
         public async Task<IActionResult> Index(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -66,7 +67,9 @@ namespace NickCM_AtlasTaskFlow.Controllers
             return View(tasks);
         }
 
-        //GET: /Tasks/Create/5
+
+
+
         public async Task<IActionResult> Create(int projectId)
         {
             var userId = _userManager.GetUserId(User);
@@ -91,7 +94,10 @@ namespace NickCM_AtlasTaskFlow.Controllers
             });
         }
 
-        //POST: /Tasks/Create
+
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -249,7 +255,6 @@ namespace NickCM_AtlasTaskFlow.Controllers
         }
 
 
-        // GET: /Tasks/Board/5
         public async Task<IActionResult> Board(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -284,7 +289,9 @@ namespace NickCM_AtlasTaskFlow.Controllers
             return View(tasks);
         }
 
-        // POST: /Tasks/UpdateStatus
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(

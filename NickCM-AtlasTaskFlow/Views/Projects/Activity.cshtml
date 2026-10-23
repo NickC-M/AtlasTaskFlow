@@ -1,0 +1,108 @@
+﻿
+@model IEnumerable<NickCM_AtlasTaskFlow.Models.ProjectActivity>
+
+@{
+    ViewData["Title"] = "Project Activity";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <div class="text-muted small text-uppercase mb-1">
+                Project Workspace
+            </div>
+
+            <h1 class="mb-2">Project Activity</h1>
+
+            <p class="text-muted mb-0">
+                @ViewBag.ProjectName
+            </p>
+        </div>
+
+        <a asp-controller="Projects"
+           asp-action="Details"
+           asp-route-id="@ViewBag.ProjectId"
+           class="btn btn-outline-secondary">
+            Back to Project
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <h5>No activity yet</h5>
+                <p class="text-muted mb-0">
+                    Project activity will appear here as your team works.
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card project-panel">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Activity</h5>
+                <span class="badge bg-secondary">
+                    @Model.Count() entries
+                </span>
+            </div>
+
+            <div class="list-group list-group-flush">
+                @foreach (var activity in Model)
+                {
+                    <div class="list-group-item py-3">
+                        <div class="d-flex gap-3">
+                            <div class="flex-shrink-0">
+                                <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
+                                      style="width: 42px; height: 42px;">
+                                    <icon name="activity" size="lg" />
+                                </span>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between flex-wrap gap-2">
+                                    <strong>
+                                        @(activity.Actor.DisplayName
+                                            ?? activity.Actor.Email
+                                            ?? "Unknown user")
+                                    </strong>
+
+                                    <span class="text-muted small">
+                                    @(activity.OccurredAtUtc.ToLocalTime().ToString("MMM d, yyyy h:mm tt"))
+
+                                    </span>
+                                </div>
+
+                                <div class="mt-1">
+                                    <span class="badge bg-primary-subtle text-primary-emphasis">
+                                        @activity.Action
+                                    </span>
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(activity.Details))
+                                {
+                                    <p class="mb-0 mt-2 text-muted">
+                                        @activity.Details
+                                    </p>
+                                }
+
+                                @if (activity.TaskItemId.HasValue)
+                                {
+                                    <div class="mt-2">
+                                        <a asp-controller="Tasks"
+                                           asp-action="Details"
+                                           asp-route-id="@activity.TaskItemId.Value"
+                                           class="small">
+                                            View related task
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

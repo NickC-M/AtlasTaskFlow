@@ -77,6 +77,12 @@
            class="btn btn-atlas project-btn-primary">
             <icon name="pencil" size="sm" /> Edit Project
         </a>
+        <a asp-controller="Projects"
+           asp-action="Activity"
+           asp-route-id="@Model.Id"
+           class="btn btn-atlas project-btn-primary">
+            <icon name="history" size="sm" /> Project Activity
+        </a>
     </div>
     <div class="row g-3 mb-4">
         <div class="col-md-4">

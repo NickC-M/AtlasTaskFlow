@@ -285,6 +285,52 @@ namespace NickCM_AtlasTaskFlow.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> Activity(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+                return Challenge();
+
+            //verify that the project exists
+            var projectExists = await _context.Projects
+                .AnyAsync(p => p.Id == id);
+
+            if (!projectExists)
+                return NotFound();
+
+            //only project members can view the activity history
+            var isMember = await _context.ProjectMembers
+                .AnyAsync(m =>
+                    m.ProjectId == id &&
+                    m.UserId == userId);
+
+            if (!isMember)
+                return View("~/Views/Shared/AccessDenied.cshtml");
+
+            var activities = await _context.ProjectActivities
+                .AsNoTracking()
+                .Where(a => a.ProjectId == id)
+                .Include(a => a.Actor)
+                .OrderByDescending(a => a.OccurredAtUtc)
+                .ThenByDescending(a => a.Id)
+                .Take(200)
+                .ToListAsync();
+
+            var project = await _context.Projects
+                .AsNoTracking()
+                .Where(p => p.Id == id)
+                .Select(p => new { p.Id, p.Name })
+                .FirstAsync();
+
+            ViewBag.ProjectId = project.Id;
+            ViewBag.ProjectName = project.Name;
+
+            return View(activities);
+        }
+
+
 
 
         [HttpGet]
