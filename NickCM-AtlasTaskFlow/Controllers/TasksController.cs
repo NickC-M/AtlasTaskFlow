@@ -581,5 +581,63 @@ namespace NickCM_AtlasTaskFlow.Controllers
             return RedirectToAction(nameof(Details), new { id = task.Id });
         }
 
+    
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+                return Challenge();
+
+            //only allow project managerss to delete the task
+            var task = await _context.TaskItems
+                .Where(t =>
+                    t.Id == id &&
+                    t.Project.Members.Any(m => m.UserId == userId &&
+                    m.Role == ProjectRole.Manager))
+                .FirstOrDefaultAsync();
+
+            if (task == null)
+                return NotFound();
+
+            var projectId = task.ProjectId;
+            var taskTitle = task.Title;
+
+            //preserve the activity history, remove FK reference to task that is deleted
+            var existingActivities = await _context.ProjectActivities
+                .Where(a => a.TaskItemId == id)
+                .ToListAsync();
+
+            foreach (var activity in existingActivities)
+            {
+                activity.TaskItemId = null;
+            }
+
+
+            //record the deletion before removing the task.
+            _context.ProjectActivities.Add(new ProjectActivity
+            {
+                ProjectId = projectId,
+                TaskItemId = null,
+                ActorId = userId,
+                Action = "TaskDeleted",
+                Details = $"Deleted task '{taskTitle}'.",
+                OccurredAtUtc = DateTime.UtcNow
+            });
+
+            _context.TaskItems.Remove(task);
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Task deleted successfully.";
+
+            return RedirectToAction(
+                nameof(Index),
+                new { id = projectId });
+        }
     }
 }

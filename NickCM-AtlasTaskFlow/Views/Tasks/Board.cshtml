@@ -8,18 +8,14 @@
     var tasks = Model.ToList();
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="project-heading d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h1>@ViewBag.ProjectName</h1>
+        <div class="project-eyebrow">PROJECT WORKSPACE</div>
+        <h1 class="project-title" >@ViewBag.ProjectName</h1>
         <p class="text-muted mb-0">Project task board</p>
     </div>
 
-    <a asp-controller="Tasks"
-       asp-action="Create"
-       asp-route-projectId="@projectId"
-       class="btn btn-primary">
-        + Create Task
-    </a>
+
 </div>
 
 @if (TempData["ErrorMessage"] is string error)
@@ -29,12 +25,18 @@
     </div>
 }
 
-<div class="mb-3">
+<div class="d-flex flex-wrap gap-2 mb-4">
     <a asp-controller="Projects"
        asp-action="Details"
        asp-route-id="@projectId"
-       class="btn btn-outline-secondary btn-sm">
+       class="btn btn-outline-atlas btn-sm">
         Back to Project
+    </a>
+        <a asp-controller="Tasks"
+       asp-action="Create"
+       asp-route-projectId="@projectId"
+       class="btn btn-atlas project-btn-primary">
+        + Create Task
     </a>
 </div>
 
