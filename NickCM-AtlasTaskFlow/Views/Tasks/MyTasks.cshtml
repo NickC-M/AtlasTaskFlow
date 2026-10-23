@@ -1,0 +1,92 @@
+﻿
+@model IEnumerable<NickCM_AtlasTaskFlow.Models.TaskItem>
+
+@{
+    ViewData["Title"] = "My Tasks";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>My Tasks</h1>
+        <p class="text-muted mb-0">
+            All your assigned tasks across your projects.
+        </p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <h4>No assigned tasks yet</h4>
+            <p class="text-muted mb-0">
+                Tasks assigned to you will appear here.
+            </p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Project</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@task.Title</strong>
+                            @if (!string.IsNullOrWhiteSpace(task.Description))
+                            {
+                                <div class="text-muted small">
+                                    @task.Description
+                                </div>
+                            }
+                        </td>
+                        <td>@task.Project.Name</td>
+                        <td>
+                            <span class="badge bg-secondary">
+                                @task.Status
+                            </span>
+                        </td>
+                        <td>@task.Priority</td>
+                        <td>
+                            @(task.DueDate?.ToString("MMM d, yyyy") ?? "No due date")
+                        </td>
+                        <td>
+                            <a asp-controller="Tasks"
+                               asp-action="Details"
+                               asp-route-id="@task.Id"
+                               class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -481,6 +481,32 @@ namespace NickCM_AtlasTaskFlow.Controllers
             return View(model);
         }
 
+
+
+        [HttpGet]
+        public async Task<IActionResult> MyTasks()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+                return Challenge();
+
+            var tasks = await _context.TaskItems
+                .AsNoTracking()
+                .Where(t =>
+                    t.OwnerId == userId &&
+                    t.Project.Members.Any(m => m.UserId == userId))
+                .Include(t => t.Project)
+                .OrderBy(t => t.Status)
+                .ThenBy(t => t.DueDate)
+                .ToListAsync();
+
+            return View(tasks);
+        }
+
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(TaskEditViewModel model)
