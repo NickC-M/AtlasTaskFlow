@@ -55,15 +55,19 @@ namespace NickCM_AtlasTaskFlow.Controllers
 
             var project = await _context.Projects
                 .AsNoTracking()
-                .Where(p =>
-                    p.Id == id &&
-                    p.Members.Any(m =>
-                        m.UserId == userId &&
-                        m.Role == ProjectRole.Manager))
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (project == null)
                 return NotFound();
+
+            var isManager = await _context.ProjectMembers
+                .AnyAsync(m =>
+                    m.ProjectId == id &&
+                    m.UserId == userId &&
+                    m.Role == ProjectRole.Manager);
+
+            if (!isManager)
+                return View("~/Views/Shared/AccessDenied.cshtml");
 
             var model = new ProjectEditViewModel
             {
@@ -87,15 +91,19 @@ namespace NickCM_AtlasTaskFlow.Controllers
                 return Challenge();
 
             var project = await _context.Projects
-                .Where(p =>
-                    p.Id == model.Id &&
-                    p.Members.Any(m =>
-                        m.UserId == userId &&
-                        m.Role == ProjectRole.Manager))
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(p => p.Id == model.Id);
 
             if (project == null)
                 return NotFound();
+
+            var isManager = await _context.ProjectMembers
+                .AnyAsync(m =>
+                    m.ProjectId == model.Id &&
+                    m.UserId == userId &&
+                    m.Role == ProjectRole.Manager);
+
+            if (!isManager)
+                return View("~/Views/Shared/AccessDenied.cshtml");
 
             if (!ModelState.IsValid)
                 return View(model);
@@ -220,15 +228,20 @@ namespace NickCM_AtlasTaskFlow.Controllers
                 return Challenge();
 
             var project = await _context.Projects
-                .Where(p =>
-                    p.Id == id &&
-                    p.Members.Any(m =>
-                        m.UserId == userId &&
-                        m.Role == ProjectRole.Manager))
-                .FirstOrDefaultAsync();
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (project == null)
                 return NotFound();
+
+            var isManager = await _context.ProjectMembers
+                .AnyAsync(m =>
+                    m.ProjectId == id &&
+                    m.UserId == userId &&
+                    m.Role == ProjectRole.Manager);
+
+            if (!isManager)
+                return View("~/Views/Shared/AccessDenied.cshtml");
 
             //find all tasks belonging to this project
             var tasks = await _context.TaskItems
@@ -282,7 +295,7 @@ namespace NickCM_AtlasTaskFlow.Controllers
             if (userId == null ||
                 !await IsProjectManagerAsync(id, userId))
             {
-                return NotFound();
+                return View("~/Views/Shared/AccessDenied.cshtml");
             }
 
             var project = await _context.Projects
@@ -324,7 +337,7 @@ namespace NickCM_AtlasTaskFlow.Controllers
             if (userId == null ||
                 !await IsProjectManagerAsync(model.ProjectId, userId))
             {
-                return NotFound();
+                return View("~/Views/Shared/AccessDenied.cshtml");
             }
 
             if (!ModelState.IsValid)

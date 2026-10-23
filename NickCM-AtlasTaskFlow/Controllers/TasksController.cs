@@ -621,14 +621,19 @@ namespace NickCM_AtlasTaskFlow.Controllers
 
             //only allow project managerss to delete the task
             var task = await _context.TaskItems
-                .Where(t =>
-                    t.Id == id &&
-                    t.Project.Members.Any(m => m.UserId == userId &&
-                    m.Role == ProjectRole.Manager))
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             if (task == null)
                 return NotFound();
+
+            var isManager = await _context.ProjectMembers
+                .AnyAsync(m =>
+                    m.ProjectId == task.ProjectId &&
+                    m.UserId == userId &&
+                    m.Role == ProjectRole.Manager);
+
+            if (!isManager)
+                return View("~/Views/Shared/AccessDenied.cshtml");
 
             var projectId = task.ProjectId;
             var taskTitle = task.Title;
