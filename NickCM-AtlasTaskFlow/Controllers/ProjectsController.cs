@@ -497,6 +497,34 @@ namespace NickCM_AtlasTaskFlow.Controllers
 
             var memberEmail = membership.User.Email;
 
+            //find all tasks currently assigned to this member in this proj
+            var assignedTasks = await _context.TaskItems
+                .Where(t =>
+                    t.ProjectId == projectId &&
+                    t.OwnerId == userId)
+                .ToListAsync();
+
+            //reset task ownership to unassigned
+            foreach (var task in assignedTasks)
+            {
+                task.OwnerId = null;
+
+                //record the ownership change
+                _context.ProjectActivities.Add(new ProjectActivity
+                {
+                    ProjectId = projectId,
+                    TaskItemId = task.Id,
+                    ActorId = currentUserId,
+                    Action = "TaskOwnershipReset",
+                    Details =
+                        $"Task '{task.Title}' was unassigned because " +
+                        $"{memberEmail} was removed from the project.",
+                    OccurredAtUtc = DateTime.UtcNow
+                });
+            }
+
+
+
             //record the activity before removing membership
             _context.ProjectActivities.Add(new ProjectActivity
             {
@@ -507,13 +535,15 @@ namespace NickCM_AtlasTaskFlow.Controllers
                 OccurredAtUtc = DateTime.UtcNow
             });
 
-            //remove only the project membership
+            //remove the project membership
             _context.ProjectMembers.Remove(membership);
 
+            //saves task ownership changes, activity records and membership removal
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] =
-                $"{memberEmail} was removed from the project.";
+                $"{memberEmail} was removed from the project." +
+                $"{assignedTasks.Count} task(s) were set to unassigned.";
 
             return RedirectToAction(
                 nameof(ManageMembers),
