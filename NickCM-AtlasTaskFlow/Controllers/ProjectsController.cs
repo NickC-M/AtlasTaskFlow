@@ -445,6 +445,83 @@ namespace NickCM_AtlasTaskFlow.Controllers
                 new { id = model.ProjectId });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveMember(
+            int projectId,
+            string userId)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+
+            if (currentUserId == null)
+                return Challenge();
+
+            //verify that current user is manager
+            var isManager = await IsProjectManagerAsync(
+                projectId, currentUserId);
+
+            if (!isManager)
+                return View("~/Views/Shared/AccessDenied.cshtml");
+
+            //find the membership record
+            var membership = await _context.ProjectMembers
+                .Include(pm => pm.User)
+                .FirstOrDefaultAsync(pm =>
+                    pm.ProjectId == projectId &&
+                    pm.UserId == userId);
+
+            if (membership == null)
+                return NotFound();
+
+            //prevent removing yourself
+            if (membership.UserId == currentUserId)
+            {
+                TempData["ErrorMessage"] =
+                    "You cannot remove yourself from the project.";
+
+                return RedirectToAction(
+                    nameof(ManageMembers),
+                    new { id = projectId });
+            }
+
+            //prevent removing another project manager.
+            if (membership.Role == ProjectRole.Manager)
+            {
+                TempData["ErrorMessage"] =
+                    "You cannot remove another project manager.";
+
+                return RedirectToAction(
+                    nameof(ManageMembers),
+                    new { id = projectId });
+            }
+
+            var memberEmail = membership.User.Email;
+
+            //record the activity before removing membership
+            _context.ProjectActivities.Add(new ProjectActivity
+            {
+                ProjectId = projectId,
+                ActorId = currentUserId,
+                Action = "MemberRemoved",
+                Details = $"Removed {memberEmail} from the project.",
+                OccurredAtUtc = DateTime.UtcNow
+            });
+
+            //remove only the project membership
+            _context.ProjectMembers.Remove(membership);
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] =
+                $"{memberEmail} was removed from the project.";
+
+            return RedirectToAction(
+                nameof(ManageMembers),
+                new { id = projectId });
+        }
+
+
+
         private async Task<IActionResult> ReloadManageMembersView(
             NickCM_AtlasTaskFlow.ViewModels
                 .AddProjectMemberViewModel model)

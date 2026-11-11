@@ -17,6 +17,13 @@
     </div>
 }
 
+@if (TempData["ErrorMessage"] is string error)
+{
+    <div class="alert alert-danger" role="alert">
+        @error
+    </div>
+}
+
 <div class="card mb-4">
     <div class="card-body">
         <h5 class="card-title">Add a team member</h5>
@@ -66,6 +73,7 @@
                     <th>Email</th>
                     <th>Role</th>
                     <th>Joined</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -82,6 +90,35 @@
                         <td>
                             @member.JoinedAtUtc.ToString("MMM d, yyyy")
                         </td>
+                        <td>
+                            @if (member.Role == ProjectRole.Member)
+                            {
+                                <form asp-action="RemoveMember"
+                                      method="post"
+                                      onsubmit="return confirm('Are you sure you want to remove this member from the project?');">
+
+                                    <input type="hidden"
+                                           name="projectId"
+                                           value="@Model.ProjectId" />
+
+                                    <input type="hidden"
+                                           name="userId"
+                                           value="@member.UserId" />
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-danger">
+                                        Remove
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    Project Manager
+                                </span>
+                            }
+                        </td>
+
                     </tr>
                 }
             </tbody>
